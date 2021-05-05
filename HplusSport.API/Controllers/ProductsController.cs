@@ -65,17 +65,35 @@ namespace HplusSport.API.Controllers
                     p => p.Price >= queryParameters.MinPrice.Value &&
                     p.Price <= queryParameters.MaxPrice.Value);
             }
+
+            //To find an specific product sku
             if (!string.IsNullOrEmpty(queryParameters.Sku))
             {
                 products = products.Where(p => p.Sku == queryParameters.Sku);
             }
+            // To find a specific product name
 
             if (!string.IsNullOrEmpty(queryParameters.Name))
             {
                 products = products.Where(p => p.Name.ToLower().Contains(queryParameters.Name.ToLower()));
             }
-            // To do the pagination 
-            products = products
+            // To sort the products
+            if (!string.IsNullOrEmpty(queryParameters.SortBy))
+            {
+                if (typeof(Product).GetProperty(queryParameters.SortBy)!=null)
+                {
+                    products = products.OrderByCustom(queryParameters.SortBy,queryParameters.SortOrder);
+                }
+            }
+            {
+
+            }
+
+
+
+
+                // To do the pagination 
+                products = products
                 .Skip(queryParameters.Size * (queryParameters.Page - 1))
                 .Take(queryParameters.Size);
 
