@@ -71,12 +71,24 @@ namespace HplusSport.API.Controllers
             {
                 products = products.Where(p => p.Sku == queryParameters.Sku);
             }
+
+            // To find a specific product searching in the name and sku 
+            
+
+            if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
+            {
+                products = products.Where(p => p.Name.ToLower().Contains(queryParameters.SearchTerm.ToLower()) ||
+                                            p.Sku.ToLower().Contains(queryParameters.SearchTerm.ToLower()));
+            }
+
             // To find a specific product name
 
-            if (!string.IsNullOrEmpty(queryParameters.Name))
+            if ( (!string.IsNullOrEmpty(queryParameters.Name)))
             {
                 products = products.Where(p => p.Name.ToLower().Contains(queryParameters.Name.ToLower()));
             }
+
+
             // To sort the products
             if (!string.IsNullOrEmpty(queryParameters.SortBy))
             {

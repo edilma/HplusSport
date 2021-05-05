@@ -12,5 +12,6 @@ namespace HplusSport.API.Classes
         public decimal? MaxPrice { get; set; }
 
         public string Name { get; set; }
+        public string SearchTerm { get; set; }
     }
 }
