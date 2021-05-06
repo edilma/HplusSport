@@ -49,10 +49,10 @@ namespace HplusSport.API.Controllers
         //    }
         //    return Ok(product);
 
-     //  }
+        //  }
 
 
-    [HttpGet]
+        [HttpGet]
         //to get all products GetAllProducts().  With Size and pagination (QueryParameters...)
         public async Task<IActionResult> GetAllProducts([FromQuery] ProductQueryParameters queryParameters)
         {
@@ -97,7 +97,7 @@ namespace HplusSport.API.Controllers
                     products = products.OrderByCustom(queryParameters.SortBy, queryParameters.SortOrder);
                 }
             }
-            
+
             // To do the pagination 
             products = products
             .Skip(queryParameters.Size * (queryParameters.Page - 1))
@@ -107,7 +107,7 @@ namespace HplusSport.API.Controllers
             return Ok(await products.ToArrayAsync());
         }
 
-        // Give the id a data type.  If the data is incorrect the response is gona be a 404
+        // Get request.  Use an id.  If the data is incorrect the response is gona be a 404
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProduct(int id)
         {
@@ -120,16 +120,54 @@ namespace HplusSport.API.Controllers
 
         }
 
+        //Add an item using a post request
+
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct([FromBody] Product product)
         {
+            
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(
                 "GetProduct",
-                new  { id = product.Id },
+                new { id = product.Id },
                 product);
+        }
+
+        //Update an item using a put request
+
+        [HttpPut ("{id}")]
+        public async Task<IActionResult> PutProduct ( [FromRoute] int id, [FromBody] Product product)
+        {
+            //if the id doesn't match the product i will return bad request 
+            if (id != product.Id)
+            {
+                return BadRequest();
+            }
+            //Here i will do the modification
+            _context.Entry(product).State = EntityState.Modified;
+                        
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                //if the product is not there ( in the db) any longer
+                if (_context.Products.Find(id) == null)
+                {
+                    return NotFound();
+                }
+
+                throw;
+            }
+            return NoContent();
+            
+
+            {
+
+            }
         }
 
 
