@@ -170,6 +170,26 @@ namespace HplusSport.API.Controllers
             }
         }
 
+        //To delete an item
+
+        [HttpDelete ("{id}")]
+        // Here I can use a Task<IActionResult> too 
+        public async Task<ActionResult<Product>> DeleteProduct (int id)
+        {
+            //Look for the product
+            var product = await _context.Products.FindAsync(id);
+
+            //If the product is not there
+            if (product ==null)
+            {
+                return NotFound();
+            }
+            //If the product is found.  Remove it
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+            return product;
+        }
+
 
     }
 }
