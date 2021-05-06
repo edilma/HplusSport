@@ -49,16 +49,16 @@ namespace HplusSport.API.Controllers
         //    }
         //    return Ok(product);
 
-        //}
+     //  }
 
 
-        [HttpGet]
+    [HttpGet]
         //to get all products GetAllProducts().  With Size and pagination (QueryParameters...)
         public async Task<IActionResult> GetAllProducts([FromQuery] ProductQueryParameters queryParameters)
         {
             IQueryable<Product> products = _context.Products;
 
-            if (queryParameters.MinPrice !=null &&
+            if (queryParameters.MinPrice != null &&
                 queryParameters.MaxPrice != null)
             {
                 products = products.Where(
@@ -73,7 +73,7 @@ namespace HplusSport.API.Controllers
             }
 
             // To find a specific product searching in the name and sku 
-            
+
 
             if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
             {
@@ -83,7 +83,7 @@ namespace HplusSport.API.Controllers
 
             // To find a specific product name
 
-            if ( (!string.IsNullOrEmpty(queryParameters.Name)))
+            if ((!string.IsNullOrEmpty(queryParameters.Name)))
             {
                 products = products.Where(p => p.Name.ToLower().Contains(queryParameters.Name.ToLower()));
             }
@@ -92,29 +92,23 @@ namespace HplusSport.API.Controllers
             // To sort the products
             if (!string.IsNullOrEmpty(queryParameters.SortBy))
             {
-                if (typeof(Product).GetProperty(queryParameters.SortBy)!=null)
+                if (typeof(Product).GetProperty(queryParameters.SortBy) != null)
                 {
-                    products = products.OrderByCustom(queryParameters.SortBy,queryParameters.SortOrder);
+                    products = products.OrderByCustom(queryParameters.SortBy, queryParameters.SortOrder);
                 }
             }
-            {
-
-            }
-
-
-
-
-                // To do the pagination 
-                products = products
-                .Skip(queryParameters.Size * (queryParameters.Page - 1))
-                .Take(queryParameters.Size);
+            
+            // To do the pagination 
+            products = products
+            .Skip(queryParameters.Size * (queryParameters.Page - 1))
+            .Take(queryParameters.Size);
 
 
             return Ok(await products.ToArrayAsync());
         }
 
         // Give the id a data type.  If the data is incorrect the response is gona be a 404
-        [HttpGet("{id:int}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetProduct(int id)
         {
             var product = await _context.Products.FindAsync(id);
@@ -125,6 +119,19 @@ namespace HplusSport.API.Controllers
             return Ok(product);
 
         }
+
+        [HttpPost]
+        public async Task<ActionResult<Product>> PostProduct([FromBody] Product product)
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(
+                "GetProduct",
+                new  { id = product.Id },
+                product);
+        }
+
 
     }
 }
