@@ -125,7 +125,7 @@ namespace HplusSport.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct([FromBody] Product product)
         {
-            
+
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
@@ -137,8 +137,8 @@ namespace HplusSport.API.Controllers
 
         //Update an item using a put request
 
-        [HttpPut ("{id}")]
-        public async Task<IActionResult> PutProduct ( [FromRoute] int id, [FromBody] Product product)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutProduct([FromRoute] int id, [FromBody] Product product)
         {
             //if the id doesn't match the product i will return bad request 
             if (id != product.Id)
@@ -147,7 +147,7 @@ namespace HplusSport.API.Controllers
             }
             //Here i will do the modification
             _context.Entry(product).State = EntityState.Modified;
-                        
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -163,7 +163,7 @@ namespace HplusSport.API.Controllers
                 throw;
             }
             return NoContent();
-            
+
 
             {
 
@@ -172,15 +172,15 @@ namespace HplusSport.API.Controllers
 
         //To delete an item
 
-        [HttpDelete ("{id}")]
+        [HttpDelete("{id}")]
         // Here I can use a Task<IActionResult> too 
-        public async Task<ActionResult<Product>> DeleteProduct (int id)
+        public async Task<ActionResult<Product>> DeleteProduct(int id)
         {
             //Look for the product
             var product = await _context.Products.FindAsync(id);
 
             //If the product is not there
-            if (product ==null)
+            if (product == null)
             {
                 return NotFound();
             }
@@ -189,6 +189,32 @@ namespace HplusSport.API.Controllers
             await _context.SaveChangesAsync();
             return product;
         }
+
+        [HttpPost]
+        [Route ("Delete")]
+        public async Task<IActionResult> DeleteManyProducts ([FromQuery] int[] ids)
+        {
+            // process products one by one
+            
+            List<Product> DeletedProducts = new List<Product>() ;
+
+            for (int i = 0; i < ids.Length; i++)
+            {
+                
+                Product myProduct = await _context.Products.FindAsync(ids[i]);
+                if (myProduct==null)
+                {
+                    return NotFound();
+                }
+              
+                DeletedProducts.Add(myProduct);
+            }
+            _context.Products.RemoveRange(DeletedProducts);
+            await _context.SaveChangesAsync();
+
+            return Ok(DeletedProducts);
+        }
+
 
 
     }
