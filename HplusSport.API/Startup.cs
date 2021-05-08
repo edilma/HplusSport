@@ -30,7 +30,21 @@ namespace HplusSport.API
             services.AddDbContext<ShopContext>(options =>
             options.UseInMemoryDatabase("Shop"));
             
-            services.AddControllers();
+            services.AddControllers()
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    //***If we do this and then we have to do the IsModelValid validation.
+                    //options.SuppressModelStateInvalidFilter = true;
+                }
+                );
+
+            //We this we do the api versioning using URL
+            services.AddApiVersioning(options =>
+            {
+                options.ReportApiVersions = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

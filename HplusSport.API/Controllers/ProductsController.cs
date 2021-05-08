@@ -11,7 +11,8 @@ using HplusSport.API.Classes;
 
 namespace HplusSport.API.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion ("1.0")]
+    [Route("v{v:apiVersion}/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
@@ -184,7 +185,7 @@ namespace HplusSport.API.Controllers
             {
                 return NotFound();
             }
-            //If the product is found.  Remove it
+            //If the product is found delete it using Remove
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
             return product;
@@ -193,22 +194,24 @@ namespace HplusSport.API.Controllers
         [HttpPost]
         [Route ("Delete")]
         public async Task<IActionResult> DeleteManyProducts ([FromQuery] int[] ids)
-        {
-            // process products one by one
-            
+        { 
+            //Create an empty list of deleted products
             List<Product> DeletedProducts = new List<Product>() ;
-
+            
+            // process products one by one
             for (int i = 0; i < ids.Length; i++)
             {
-                
+                //Look for the product by id
                 Product myProduct = await _context.Products.FindAsync(ids[i]);
+                //If they product is not found 
                 if (myProduct==null)
                 {
                     return NotFound();
                 }
-              
+              // If the product is found we add it to the list of items to delete
                 DeletedProducts.Add(myProduct);
             }
+            //delete all the items required at the same time.  Using RemoveRange
             _context.Products.RemoveRange(DeletedProducts);
             await _context.SaveChangesAsync();
 
